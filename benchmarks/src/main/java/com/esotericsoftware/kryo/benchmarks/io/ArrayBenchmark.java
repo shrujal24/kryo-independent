@@ -87,6 +87,7 @@ public class ArrayBenchmark {
 
 	@State(Scope.Thread)
 	static public class ReadIntsState extends WriteIntsState {
+		@Override
 		public void setup () {
 			super.setup();
 			new ArrayBenchmark().writeInts(this);
@@ -98,6 +99,7 @@ public class ArrayBenchmark {
 		public long[] longs = {0, 1, 2, 3, 4, 5, 63, 64, 65, 127, 128, 129, 4000, 5000, 6000, 16000, 32000, 256000, 1024000, -1, -2,
 			-3, -4, Integer.MIN_VALUE, Integer.MAX_VALUE, Long.MIN_VALUE, Long.MAX_VALUE, 9999999999l};
 
+		@Override
 		public void setup () {
 			super.setup();
 			new ArrayBenchmark().writeLongs(this);
@@ -106,6 +108,7 @@ public class ArrayBenchmark {
 
 	@State(Scope.Thread)
 	static public class ReadLongsState extends WriteLongsState {
+		@Override
 		public void setup () {
 			super.setup();
 			new ArrayBenchmark().writeLongs(this);

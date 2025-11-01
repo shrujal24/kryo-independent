@@ -71,6 +71,7 @@ public class StringBenchmark {
 
 	@State(Scope.Thread)
 	static public class ReadString extends InputOutputState {
+		@Override
 		public void setup () {
 			super.setup();
 			new StringBenchmark().writeString(this);
@@ -79,6 +80,7 @@ public class StringBenchmark {
 
 	@State(Scope.Thread)
 	static public class ReadStringLong extends InputOutputState {
+		@Override
 		public void setup () {
 			super.setup();
 			new StringBenchmark().writeStringLong(this);
@@ -87,6 +89,7 @@ public class StringBenchmark {
 
 	@State(Scope.Thread)
 	static public class ReadAsciiLong extends InputOutputState {
+		@Override
 		public void setup () {
 			super.setup();
 			new StringBenchmark().writeAsciiLong(this);
