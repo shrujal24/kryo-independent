@@ -10,10 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PUBLISH_ARTIFACTS: true
+      # Only publish from the upstream repo's master with valid secrets.
+      SHOULD_PUBLISH: ${{ github.repository == 'EsotericSoftware/kryo' && github.ref == 'refs/heads/master' && secrets.CENTRAL_USERNAME != '' && secrets.CENTRAL_PASSWORD != '' }}
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -34,39 +36,41 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 11
-      - name: Test with JDK 11          
+      - name: Test with JDK 11
         run: mvn -v && mvn -B test
 
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Test with JDK 17         
+      - name: Test with JDK 17
         run: mvn -v && mvn -B test
-        
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 21
       - name: Test with JDK 21
         run: mvn -v && mvn -B test
-        
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 25
       - name: Test with JDK 25
         run: mvn -v && mvn -B test
-      
+
+      # ---- Publish only on upstream master with valid secrets ----
       - name: Set up settings.xml for Sonatype
+        if: env.SHOULD_PUBLISH == 'true'
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 11
 
-      - name: Publish SNAPSHOT version to Sonatype (we can skip tests, since we only deploy, if the build workflow succeeded)
+      - name: Publish SNAPSHOT version to Sonatype (deploy only on upstream/master)
+        if: env.SHOULD_PUBLISH == 'true'
         run: mvn -v && mvn -B -P requireSnapshot --no-transfer-progress -DskipTests deploy --settings build/settings-sonatype.xml
-        if: env.PUBLISH_ARTIFACTS == 'true'
         env:
           CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
           CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
