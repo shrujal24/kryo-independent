@@ -125,6 +125,7 @@ public void setup () {
 	}
 
 	static public class FieldSerializerState extends BenchmarkState {
+		@Override		//Fixed this Issue, Added @Override
 		public void setup () {
 			kryo.setDefaultSerializer(FieldSerializer.class);
 			super.setup();
@@ -134,6 +135,7 @@ public void setup () {
 	static public class CompatibleState extends BenchmarkState {
 		@Param({"true", "false"}) public boolean chunked;
 
+		@Override
 		public void setup () {
 			CompatibleFieldSerializerFactory factory = new CompatibleFieldSerializerFactory();
 			factory.getConfig().setChunkedEncoding(chunked);
@@ -146,6 +148,7 @@ public void setup () {
 	static public class TaggedState extends BenchmarkState {
 		@Param({"true", "false"}) public boolean chunked;
 
+		@Override
 		public void setup () {
 			TaggedFieldSerializerFactory factory = new TaggedFieldSerializerFactory();
 			factory.getConfig().setChunkedEncoding(chunked);
@@ -156,6 +159,7 @@ public void setup () {
 	}
 
 	static public class VersionState extends BenchmarkState {
+		@Override
 		public void setup () {
 			kryo.setDefaultSerializer(VersionFieldSerializer.class);
 			super.setup();
@@ -163,6 +167,7 @@ public void setup () {
 	}
 
 	static public class CustomState extends BenchmarkState {
+		@Override
 		public void setup () {
 			super.setup();
 			switch (objectType) {
