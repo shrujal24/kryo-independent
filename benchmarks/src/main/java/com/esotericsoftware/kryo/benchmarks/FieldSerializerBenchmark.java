@@ -83,33 +83,33 @@ public class FieldSerializerBenchmark {
 		Object object;
 
 		@Setup(Level.Trial)
-		public void setup () {
-			switch (objectType) {
-			case sample:
-				object = new Sample().populate(references);
-				kryo.register(double[].class);
-				kryo.register(int[].class);
-				kryo.register(long[].class);
-				kryo.register(float[].class);
-				kryo.register(double[].class);
-				kryo.register(short[].class);
-				kryo.register(char[].class);
-				kryo.register(boolean[].class);
-				kryo.register(object.getClass());
-				break;
-			case media:
-				object = new MediaContent().populate(references);
-				kryo.register(Image.class);
-				kryo.register(Size.class);
-				kryo.register(Media.class);
-				kryo.register(Player.class);
-				kryo.register(ArrayList.class);
-				kryo.register(MediaContent.class);
-				break;
-			}
+public void setup () {
+    if (objectType == ObjectType.sample) {
+        object = new Sample().populate(references);
+        kryo.register(double[].class);
+        kryo.register(int[].class);
+        kryo.register(long[].class);
+        kryo.register(float[].class);
+        kryo.register(double[].class);
+        kryo.register(short[].class);
+        kryo.register(char[].class);
+        kryo.register(boolean[].class);
+        kryo.register(object.getClass());
+    } else if (objectType == ObjectType.media) {
+        object = new MediaContent().populate(references);
+        kryo.register(Image.class);
+        kryo.register(Size.class);
+        kryo.register(Media.class);
+        kryo.register(Player.class);
+        kryo.register(ArrayList.class);
+        kryo.register(MediaContent.class);
+    } else {
+        // Future-proofing if enum grows
+        throw new IllegalStateException("Unexpected objectType: " + objectType);
+    }
 
-			kryo.setReferences(references);
-		}
+    kryo.setReferences(references);
+}
 
 		public void roundTrip () {
 			output.setPosition(0);
