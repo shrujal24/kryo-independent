@@ -119,7 +119,7 @@ public void setup () {
 			kryo.readObject(input, object.getClass());
 		}
 
-		static public enum ObjectType {
+		public enum ObjectType {
 			sample, media
 		}
 	}
