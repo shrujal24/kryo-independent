@@ -158,7 +158,7 @@ public void setup () {
 		}
 	}
 
-	static public class VersionState extends BenchmarkState {
+	public static class VersionState extends BenchmarkState {
 		@Override
 		public void setup () {
 			kryo.setDefaultSerializer(VersionFieldSerializer.class);
