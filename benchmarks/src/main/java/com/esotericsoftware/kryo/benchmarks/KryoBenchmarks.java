@@ -35,7 +35,6 @@ public class KryoBenchmarks {
 			// + "FieldSerializerBenchmark.tagged" //
 			;
 			log.info(commandLine);
-			//System.out.println(commandLine);
 			args = commandLine.split(" ");
 		}
 		Main.main(args);
