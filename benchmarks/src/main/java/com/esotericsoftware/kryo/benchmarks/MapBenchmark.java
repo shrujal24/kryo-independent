@@ -42,23 +42,24 @@ public class MapBenchmark {
 
     @State(Scope.Thread)
     public static class AbstractBenchmarkState {
+
         @Param({"OBJECT", "IDENTITY", "CUCKOO", "HASH"})
-        public MapType mapType;
+        public MapType MAP_TYPE;
 
         @Param({"integers", "strings", "classes"})
-        public DataSource dataSource;
+        public DataSource DATA_SOURCE;
 
         @Param({"100", "500", "1000", "2500", "5000", "10000"})
-        public int numClasses;
+        public int NUM_CLASSES;
 
         @Param({"51"})
-        public int initialCapacity;
+        public int INITIAL_CAPACITY;
 
         @Param({"0.7", "0.75", "0.8"})
-        public float loadFactor;
+        public float LOAD_FACTOR;
 
         @Param({"8192"})
-        public int maxCapacity;
+        public int MAX_CAPACITY;
 
         MapAdapter<Object, Integer> map;
         List<Object> data;
@@ -70,15 +71,15 @@ public class MapBenchmark {
 
         @Setup(Level.Trial)
         public void setup() {
-            map = createMap(mapType, initialCapacity, loadFactor, maxCapacity);
-            data = dataSource.buildData(random, numClasses);
+            map = createMap(MAP_TYPE, INITIAL_CAPACITY, LOAD_FACTOR, MAX_CAPACITY);
+            data = DATA_SOURCE.buildData(random, NUM_CLASSES);
             data.forEach(c -> map.put(c, 1));
             Collections.shuffle(data);
         }
 
         public void read(Blackhole blackhole) {
             data.stream()
-                .limit(numClasses)
+                .limit(NUM_CLASSES)
                 .map(map::get)
                 .forEach(blackhole::consume);
         }
@@ -91,10 +92,10 @@ public class MapBenchmark {
 
         @Setup(Level.Trial)
         public void setup() {
-            map = createMap(mapType, initialCapacity, loadFactor, maxCapacity);
-            data = dataSource.buildData(random, numClasses);
+            map = createMap(MAP_TYPE, INITIAL_CAPACITY, LOAD_FACTOR, MAX_CAPACITY);
+            data = DATA_SOURCE.buildData(random, NUM_CLASSES);
             data.forEach(c -> map.put(c, 1));
-            moreData = dataSource.buildData(random, numClasses);
+            moreData = DATA_SOURCE.buildData(random, NUM_CLASSES);
         }
 
         public void miss(Blackhole blackhole) {
@@ -110,8 +111,8 @@ public class MapBenchmark {
 
         @Setup(Level.Trial)
         public void setup() {
-            map = createMap(mapType, initialCapacity, loadFactor, maxCapacity);
-            data = dataSource.buildData(random, numClasses);
+            map = createMap(MAP_TYPE, INITIAL_CAPACITY, LOAD_FACTOR, MAX_CAPACITY);
+            data = DATA_SOURCE.buildData(random, NUM_CLASSES);
             Collections.shuffle(data);
         }
 
@@ -125,7 +126,7 @@ public class MapBenchmark {
             data.forEach(c -> map.put(c, 1));
             Collections.shuffle(data);
             data.stream()
-                .limit(numClasses)
+                .limit(NUM_CLASSES)
                 .map(map::get)
                 .forEach(blackhole::consume);
             map.clear();
@@ -147,8 +148,8 @@ public class MapBenchmark {
         },
         strings {
             Object getData(Random random) {
-                int leftLimit = 97; // 'a'
-                int rightLimit = 122; // 'z'
+                int leftLimit = 97;
+                int rightLimit = 122;
                 int low = 10;
                 int high = 100;
                 int length = random.nextInt(high - low) + low;
