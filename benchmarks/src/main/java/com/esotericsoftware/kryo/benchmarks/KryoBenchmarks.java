@@ -26,9 +26,10 @@ public class KryoBenchmarks {
 	/** To run from command line: $ mvn clean install exec:java -Dexec.args="-f 4 -wi 5 -i 3 -t 2 -w 2s -r 2s"
 	 * <p>
 	 * Fork 0 can be used for debugging/development, eg: -f 0 -wi 1 -i 1 -t 1 -w 1s -r 1s [benchmarkClassName] */
-	static public void main (String[] args) throws Exception {
+	private static final Logger log = Logger.getLogger(KryoBenchmarks.class.getName());
+	 static public void main (String[] args) throws Exception {
 		if (args.length == 0) {
-			private static final Logger log = Logger.getLogger(KryoBenchmarks.class.getName());
+			
 			String commandLine = "-f 0 -wi 1 -i 1 -t 1 -w 1s -r 1s " // For developement only (fork 0, short runs).
 			// + "-bs 2500000 ArrayBenchmark" //
 			// + "-rf csv FieldSerializerBenchmark.field FieldSerializerBenchmark.tagged" //
