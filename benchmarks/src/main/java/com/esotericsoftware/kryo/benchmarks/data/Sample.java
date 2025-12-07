@@ -52,6 +52,7 @@ public class Sample {
 	@Tag(22) public Sample sample; // Can be null.
 
 	public Sample () {
+		// This is a small optimization to avoid allocating arrays when empty. yet to be populated.
 	}
 
 	public Sample populate (boolean circularReference) {

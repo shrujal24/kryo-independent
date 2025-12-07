@@ -32,19 +32,33 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.spec.SecretKeySpec;
 
+import java.security.SecureRandom;
+import javax.crypto.spec.GCMParameterSpec;
+
+
 /** Encrypts data using the blowfish cipher.
  * @author Nathan Sweet */
 public class BlowfishSerializer extends Serializer {
-	private final Serializer serializer;
-	private static SecretKeySpec keySpec;
+    private final Serializer serializer;
+    private static SecretKeySpec keySpec;
+    private static final String ALGO = "AES/GCM/NoPadding";  // <— NEW LINE
+	private static final int GCM_TAG_LENGTH = 128;      // 128-bit tag
+    private static final int GCM_IV_LENGTH = 12;	// 96-bit recommended IV for GCM
+
 
 	public BlowfishSerializer (Serializer serializer, byte[] key) {
 		this.serializer = serializer;
-		keySpec = new SecretKeySpec(key, "Blowfish");
+		keySpec = new SecretKeySpec(key, "AES");	// <— NEW LINE
 	}
 
 	public void write (Kryo kryo, Output output, Object object) {
-		Cipher cipher = getCipher(Cipher.ENCRYPT_MODE);
+		byte[] iv = new byte[GCM_IV_LENGTH];
+		new SecureRandom().nextBytes(iv);
+
+		Cipher cipher = getCipher(Cipher.ENCRYPT_MODE, iv);
+		output.writeInt(iv.length);
+		output.writeBytes(iv);
+		
 		CipherOutputStream cipherStream = new CipherOutputStream(output, cipher);
 		Output cipherOutput = new Output(cipherStream, 256) {
 			public void close () throws KryoException {
@@ -61,7 +75,11 @@ public class BlowfishSerializer extends Serializer {
 	}
 
 	public Object read (Kryo kryo, Input input, Class type) {
-		Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
+		// Read the IV from the input stream first
+		int ivLength = input.readInt();
+		byte[] iv = input.readBytes(ivLength);
+		
+		Cipher cipher = getCipher(Cipher.DECRYPT_MODE, iv);
 		CipherInputStream cipherInput = new CipherInputStream(input, cipher);
 		return serializer.read(kryo, new Input(cipherInput, 256), type);
 	}
@@ -70,13 +88,15 @@ public class BlowfishSerializer extends Serializer {
 		return serializer.copy(kryo, original);
 	}
 
-	private static Cipher getCipher (int mode) {
+	private static Cipher getCipher (int mode, byte[] iv) {
 		try {
-			Cipher cipher = Cipher.getInstance("Blowfish");
-			cipher.init(mode, keySpec);
+			Cipher cipher = Cipher.getInstance(ALGO);
+			GCMParameterSpec gcmSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+			cipher.init(mode, keySpec, gcmSpec);
 			return cipher;
 		} catch (Exception ex) {
 			throw new KryoException(ex);
 		}
 	}
+
 }

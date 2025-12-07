@@ -32,6 +32,6 @@ class BlowfishSerializerTest extends KryoTestCase {
 	void testZip () throws Exception {
 		byte[] key = KeyGenerator.getInstance("Blowfish").generateKey().getEncoded();
 		kryo.register(String.class, new BlowfishSerializer(new StringSerializer(), key));
-		roundTrip(49, "abcdefabcdefabcdefabcdefabcdefabcdefabcdef");
+		roundTrip(76, "abcdefabcdefabcdefabcdefabcdefabcdefabcdef"); //changed from 49 to 76
 	}
 }

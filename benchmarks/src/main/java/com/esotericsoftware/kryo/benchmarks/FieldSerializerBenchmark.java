@@ -1,15 +1,15 @@
 /* Copyright (c) 2008-2025, Nathan Sweet
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
  * conditions are met:
- * 
+ *
  * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
  * disclaimer in the documentation and/or other materials provided with the distribution.
  * - Neither the name of Esoteric Software nor the names of its contributors may be used to endorse or promote products derived
  * from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
  * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
  * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
@@ -73,7 +73,7 @@ public class FieldSerializerBenchmark {
 	//
 
 	@State(Scope.Thread)
-	static public abstract class BenchmarkState {
+	public static abstract class BenchmarkState {
 		@Param({"true", "false"}) public boolean references;
 		@Param() public ObjectType objectType;
 
@@ -83,33 +83,32 @@ public class FieldSerializerBenchmark {
 		Object object;
 
 		@Setup(Level.Trial)
-public void setup () {
-    if (objectType == ObjectType.sample) {
-        object = new Sample().populate(references);
-        kryo.register(double[].class);
-        kryo.register(int[].class);
-        kryo.register(long[].class);
-        kryo.register(float[].class);
-        kryo.register(double[].class);
-        kryo.register(short[].class);
-        kryo.register(char[].class);
-        kryo.register(boolean[].class);
-        kryo.register(object.getClass());
-    } else if (objectType == ObjectType.media) {
-        object = new MediaContent().populate(references);
-        kryo.register(Image.class);
-        kryo.register(Size.class);
-        kryo.register(Media.class);
-        kryo.register(Player.class);
-        kryo.register(ArrayList.class);
-        kryo.register(MediaContent.class);
-    } else {
-        // Future-proofing if enum grows
-        throw new IllegalStateException("Unexpected objectType: " + objectType);
-    }
+		public void setup () {
+			if (objectType == ObjectType.SAMPLE) {
+				object = new Sample().populate(references);
+				kryo.register(double[].class);
+				kryo.register(int[].class);
+				kryo.register(long[].class);
+				kryo.register(float[].class);
+				kryo.register(double[].class);
+				kryo.register(short[].class);
+				kryo.register(char[].class);
+				kryo.register(boolean[].class);
+				kryo.register(object.getClass());
+			} else if (objectType == ObjectType.MEDIA) {
+				object = new MediaContent().populate(references);
+				kryo.register(Image.class);
+				kryo.register(Size.class);
+				kryo.register(Media.class);
+				kryo.register(Player.class);
+				kryo.register(ArrayList.class);
+				kryo.register(MediaContent.class);
+			} else {
+				throw new IllegalStateException("Unexpected objectType: " + objectType);
+			}
 
-    kryo.setReferences(references);
-}
+			kryo.setReferences(references);
+		}
 
 		public void roundTrip () {
 			output.setPosition(0);
@@ -120,45 +119,45 @@ public void setup () {
 		}
 
 		public enum ObjectType {
-			sample, media
+			SAMPLE, MEDIA
 		}
 	}
 
-	static public class FieldSerializerState extends BenchmarkState {
-		@Override		//Fixed this Issue, Added @Override
+	public static class FieldSerializerState extends BenchmarkState {
+		@Override // Fixed this Issue, Added @Override
 		public void setup () {
 			kryo.setDefaultSerializer(FieldSerializer.class);
 			super.setup();
 		}
 	}
 
-	static public class CompatibleState extends BenchmarkState {
+	public static class CompatibleState extends BenchmarkState {
 		@Param({"true", "false"}) public boolean chunked;
 
 		@Override
 		public void setup () {
 			CompatibleFieldSerializerFactory factory = new CompatibleFieldSerializerFactory();
 			factory.getConfig().setChunkedEncoding(chunked);
-			factory.getConfig().setReadUnknownFieldData(true); // Typical to always use.
+			factory.getConfig().setReadUnknownFieldData(true);
 			kryo.setDefaultSerializer(factory);
 			super.setup();
 		}
 	}
 
-	static public class TaggedState extends BenchmarkState {
+	public static class TaggedState extends BenchmarkState {
 		@Param({"true", "false"}) public boolean chunked;
 
 		@Override
 		public void setup () {
 			TaggedFieldSerializerFactory factory = new TaggedFieldSerializerFactory();
 			factory.getConfig().setChunkedEncoding(chunked);
-			if (chunked) factory.getConfig().setReadUnknownTagData(true); // Typical to use with chunked.
+			if (chunked) factory.getConfig().setReadUnknownTagData(true);
 			kryo.setDefaultSerializer(factory);
 			super.setup();
 		}
 	}
 
-	static public class VersionState extends BenchmarkState {
+	public static class VersionState extends BenchmarkState {
 		@Override
 		public void setup () {
 			kryo.setDefaultSerializer(VersionFieldSerializer.class);
@@ -166,12 +165,12 @@ public void setup () {
 		}
 	}
 
-	static public class CustomState extends BenchmarkState {
+	public static class CustomState extends BenchmarkState {
 		@Override
 		public void setup () {
 			super.setup();
 			switch (objectType) {
-			case sample:
+			case SAMPLE:
 				kryo.register(Sample.class, new Serializer<Sample>() {
 					public void write (Kryo kryo, Output output, Sample object) {
 						output.writeInt(object.intValue);
@@ -233,7 +232,8 @@ public void setup () {
 					}
 				});
 				break;
-			case media:
+
+			case MEDIA:
 				MediaSerializer mediaSerializer = new MediaSerializer(kryo);
 				ImageSerializer imageSerializer = new ImageSerializer();
 				kryo.register(Image.class, imageSerializer);
@@ -244,7 +244,7 @@ public void setup () {
 		}
 	}
 
-	static class MediaContentSerializer extends Serializer<MediaContent> {
+	public static class MediaContentSerializer extends Serializer<MediaContent> {
 		private final MediaSerializer mediaSerializer;
 		private final CollectionSerializer imagesSerializer;
 
@@ -265,8 +265,8 @@ public void setup () {
 		}
 	}
 
-	static class MediaSerializer extends Serializer<Media> {
-		static private final Media.Player[] players = Media.Player.values();
+	public static class MediaSerializer extends Serializer<Media> {
+		private static final Media.Player[] players = Media.Player.values();
 
 		private final CollectionSerializer personsSerializer;
 
@@ -277,9 +277,11 @@ public void setup () {
 		}
 
 		public Media read (Kryo kryo, Input input, Class<? extends Media> type) {
-			return new Media(input.readString(), input.readString(), input.readInt(true), input.readInt(true), input.readString(),
+			return new Media(
+				input.readString(), input.readString(), input.readInt(true), input.readInt(true), input.readString(),
 				input.readLong(true), input.readLong(true), input.readInt(true), input.readBoolean(),
-				kryo.readObject(input, ArrayList.class, personsSerializer), players[input.readInt(true)], input.readString());
+				kryo.readObject(input, ArrayList.class, personsSerializer), players[input.readInt(true)], input.readString()
+			);
 		}
 
 		public void write (Kryo kryo, Output output, Media media) {
@@ -298,12 +300,14 @@ public void setup () {
 		}
 	}
 
-	static class ImageSerializer extends Serializer<Image> {
-		static private final Size[] sizes = Size.values();
+	public static class ImageSerializer extends Serializer<Image> {
+		private static final Size[] sizes = Size.values();
 
 		public Image read (Kryo kryo, Input input, Class<? extends Image> type) {
-			return new Image(input.readString(), input.readString(), input.readInt(true), input.readInt(true),
-				sizes[input.readInt(true)], kryo.readObjectOrNull(input, Media.class));
+			return new Image(
+				input.readString(), input.readString(), input.readInt(true), input.readInt(true),
+				sizes[input.readInt(true)], kryo.readObjectOrNull(input, Media.class)
+			);
 		}
 
 		public void write (Kryo kryo, Output output, Image image) {
