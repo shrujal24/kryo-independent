@@ -37,7 +37,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class BlowfishSerializer extends Serializer {
     private final Serializer serializer;
     private static SecretKeySpec keySpec;
-    private static final String ALGO = "AES";  // <— NEW LINE
+    private static final String ALGO = "AES/GCM/NoPadding";  // <— NEW LINE
 
 
 	public BlowfishSerializer (Serializer serializer, byte[] key) {
