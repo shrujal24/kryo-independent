@@ -88,13 +88,6 @@ public class BlowfishSerializer extends Serializer {
 		return serializer.copy(kryo, original);
 	}
 
-	private static Cipher getCipher (int mode) {
-		// Generate a random IV for encryption
-		byte[] iv = new byte[GCM_IV_LENGTH];
-		new SecureRandom().nextBytes(iv);
-		return getCipher(mode, iv);
-	}
-
 	private static Cipher getCipher (int mode, byte[] iv) {
 		try {
 			Cipher cipher = Cipher.getInstance(ALGO);
