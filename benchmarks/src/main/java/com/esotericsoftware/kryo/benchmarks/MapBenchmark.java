@@ -264,12 +264,11 @@ public class MapBenchmark {
 		}
 	}
 
-	private static class HashMapAdapter<K> implements MapAdapter<K, Integer> {
-		private final HashMap<K, Integer> delegate;
+	private final Map<K, Integer> delegate;
 
-		public HashMapAdapter (HashMap<K, Integer> delegate) {
-			this.delegate = delegate;
-		}
+public HashMapAdapter(Map<K, Integer> delegate) {
+    this.delegate = delegate;
+}
 
 		@Override
 		public Integer get (K key) {
