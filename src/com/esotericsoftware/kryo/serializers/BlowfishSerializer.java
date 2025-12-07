@@ -35,12 +35,14 @@ import javax.crypto.spec.SecretKeySpec;
 /** Encrypts data using the blowfish cipher.
  * @author Nathan Sweet */
 public class BlowfishSerializer extends Serializer {
-	private final Serializer serializer;
-	private static SecretKeySpec keySpec;
+    private final Serializer serializer;
+    private static SecretKeySpec keySpec;
+    private static final String ALGO = "AES";  // <— NEW LINE
+
 
 	public BlowfishSerializer (Serializer serializer, byte[] key) {
 		this.serializer = serializer;
-		keySpec = new SecretKeySpec(key, "Blowfish");
+		keySpec = new SecretKeySpec(key, ALGO);	// <— NEW LINE
 	}
 
 	public void write (Kryo kryo, Output output, Object object) {
@@ -72,7 +74,7 @@ public class BlowfishSerializer extends Serializer {
 
 	private static Cipher getCipher (int mode) {
 		try {
-			Cipher cipher = Cipher.getInstance("Blowfish");
+			Cipher cipher = Cipher.getInstance(ALGO);  // <— NEW LINE
 			cipher.init(mode, keySpec);
 			return cipher;
 		} catch (Exception ex) {
