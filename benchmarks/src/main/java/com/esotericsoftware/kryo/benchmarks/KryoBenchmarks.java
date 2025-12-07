@@ -18,6 +18,7 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 package com.esotericsoftware.kryo.benchmarks;
+import java.util.logging.Logger;
 
 import org.openjdk.jmh.Main;
 
@@ -27,12 +28,14 @@ public class KryoBenchmarks {
 	 * Fork 0 can be used for debugging/development, eg: -f 0 -wi 1 -i 1 -t 1 -w 1s -r 1s [benchmarkClassName] */
 	static public void main (String[] args) throws Exception {
 		if (args.length == 0) {
+			private static final Logger log = Logger.getLogger(KryoBenchmarks.class.getName());
 			String commandLine = "-f 0 -wi 1 -i 1 -t 1 -w 1s -r 1s " // For developement only (fork 0, short runs).
 			// + "-bs 2500000 ArrayBenchmark" //
 			// + "-rf csv FieldSerializerBenchmark.field FieldSerializerBenchmark.tagged" //
 			// + "FieldSerializerBenchmark.tagged" //
 			;
-			System.out.println(commandLine);
+			log.info(commandLine);
+			//System.out.println(commandLine);
 			args = commandLine.split(" ");
 		}
 		Main.main(args);
