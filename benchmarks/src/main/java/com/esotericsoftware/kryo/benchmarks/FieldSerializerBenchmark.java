@@ -84,7 +84,7 @@ public class FieldSerializerBenchmark {
 
 		@Setup(Level.Trial)
 		public void setup () {
-			if (objectType == ObjectType.sample) {
+			if (objectType == ObjectType.SAMPLE) {
 				object = new Sample().populate(references);
 				kryo.register(double[].class);
 				kryo.register(int[].class);
@@ -95,7 +95,7 @@ public class FieldSerializerBenchmark {
 				kryo.register(char[].class);
 				kryo.register(boolean[].class);
 				kryo.register(object.getClass());
-			} else if (objectType == ObjectType.media) {
+			} else if (objectType == ObjectType.MEDIA) {
 				object = new MediaContent().populate(references);
 				kryo.register(Image.class);
 				kryo.register(Size.class);
@@ -104,7 +104,6 @@ public class FieldSerializerBenchmark {
 				kryo.register(ArrayList.class);
 				kryo.register(MediaContent.class);
 			} else {
-				// Future-proofing if enum grows
 				throw new IllegalStateException("Unexpected objectType: " + objectType);
 			}
 
@@ -120,7 +119,7 @@ public class FieldSerializerBenchmark {
 		}
 
 		public enum ObjectType {
-			sample, media
+			SAMPLE, MEDIA
 		}
 	}
 
@@ -139,7 +138,7 @@ public class FieldSerializerBenchmark {
 		public void setup () {
 			CompatibleFieldSerializerFactory factory = new CompatibleFieldSerializerFactory();
 			factory.getConfig().setChunkedEncoding(chunked);
-			factory.getConfig().setReadUnknownFieldData(true); // Typical to always use.
+			factory.getConfig().setReadUnknownFieldData(true);
 			kryo.setDefaultSerializer(factory);
 			super.setup();
 		}
@@ -152,7 +151,7 @@ public class FieldSerializerBenchmark {
 		public void setup () {
 			TaggedFieldSerializerFactory factory = new TaggedFieldSerializerFactory();
 			factory.getConfig().setChunkedEncoding(chunked);
-			if (chunked) factory.getConfig().setReadUnknownTagData(true); // Typical to use with chunked.
+			if (chunked) factory.getConfig().setReadUnknownTagData(true);
 			kryo.setDefaultSerializer(factory);
 			super.setup();
 		}
@@ -171,7 +170,7 @@ public class FieldSerializerBenchmark {
 		public void setup () {
 			super.setup();
 			switch (objectType) {
-			case sample:
+			case SAMPLE:
 				kryo.register(Sample.class, new Serializer<Sample>() {
 					public void write (Kryo kryo, Output output, Sample object) {
 						output.writeInt(object.intValue);
@@ -233,7 +232,8 @@ public class FieldSerializerBenchmark {
 					}
 				});
 				break;
-			case media:
+
+			case MEDIA:
 				MediaSerializer mediaSerializer = new MediaSerializer(kryo);
 				ImageSerializer imageSerializer = new ImageSerializer();
 				kryo.register(Image.class, imageSerializer);
